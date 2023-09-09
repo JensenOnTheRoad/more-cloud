@@ -1,4 +1,4 @@
-package com.jds.mc.config;
+package com.jds.mc.infrastucture.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
