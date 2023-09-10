@@ -3,6 +3,7 @@ package com.jds.mc.infrastucture.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.jds.mc.application_api.model.res.PageResult;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,28 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import com.jds.mc.application_api.model.res.PageResult;
 import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisConnectionUtils;
-import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 /**
  * @author jensen_deng
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class RedisUtils {
+
   private final StringRedisTemplate redisTemplate;
-  private final Gson gson =
+
+  private static final Gson gson =
       new GsonBuilder()
           .registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTime())
           .registerTypeAdapter(LocalDate.class, new GsonLocalDate())
@@ -147,4 +145,5 @@ public class RedisUtils {
   }
 
   // endregion
+
 }

@@ -1,11 +1,15 @@
 server:
   port: 8080
+# Spring
 spring:
+  cache:
+    type: redis
   data:
+    # redis
     redis:
       host: 127.0.0.1
       port: 16379
-      database: 1
+      database: 0
       #    password: 123456 #默认为空
       timeout: 3000ms
       lettuce:
@@ -14,11 +18,13 @@ spring:
           max-wait: -1    # 最大阻塞等待时间，负值表示没限制，默认-1
           max-idle: 8     # 最大空闲连接，默认8
           min-idle: 0     # 最小空闲连接，默认0
+  # datasource
   datasource:
     url: jdbc:postgresql://localhost:15433/more_cloud
     password: password
     username: postgres
     driver-class-name: org.postgresql.Driver
+  # jpa
   jpa:
     properties:
       hibernate:
@@ -31,3 +37,8 @@ spring:
 logging:
   level:
     com.jds.mc: debug
+
+# custom config
+
+custom:
+  cache-prefix: more-cloud

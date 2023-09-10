@@ -10,17 +10,15 @@ import com.jds.mc.infrastucture.jpa.PermissionRepository;
 import com.jds.mc.infrastucture.jpa.UserRepository;
 import com.jds.mc.infrastucture.mapper.PermissionMapper;
 import com.jds.mc.infrastucture.mapper.UserMapper;
+import com.jds.mc.infrastucture.utils.RedisUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Example;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,13 +35,16 @@ public class AuthImpl implements IAuth {
 
   private final PermissionRepository permissionRepository;
 
+  private final CacheManager cacheManager;
+
+  private final RedisUtils redisUtils;
+
   @Override
   public void login(User domain) {
     Optional<User> userInfo =
         userRepository
             .findOne(Example.of(UserMapper.INSTANCE.from(domain)))
             .map(UserMapper.INSTANCE::toDomain);
-
     Long userId =
         userInfo
             .map(
@@ -77,16 +78,7 @@ public class AuthImpl implements IAuth {
   }
 
   private void saveSession(User domain) {
-    //    Cache cache = cacheManager.getCache("USERS");
-    //    // 向缓存中添加数据
-    //    cache.put(domain.getId(), domain);
-    //    // 打印测试
-    //    User cacheObj = cache.get(domain.getId(), User.class);
-    //    log.info("putted cache: {}", cacheObj);
-    //    // 清空缓存数据
-    //    cache.clear();
-    //    // 打印测试
-    //    log.info("after cache: {}", cacheObj);
+    redisUtils.set(String.valueOf(domain.getId()), domain);
   }
 
   // 缓存用户权限到Redis

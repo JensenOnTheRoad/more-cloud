@@ -1,23 +1,26 @@
 package com.jds.mc;
 
+import com.jds.mc.infrastucture.utils.RedisUtils;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @SpringBootTest
+@Slf4j
 public class RedisTest {
-  @Autowired private RedisTemplate<String, Object> redisTemplate;
+
+  @Resource private RedisUtils redisUtils;
 
   @Test
+  @DisplayName("redis测试")
   public void test() {
+    String key = "testKey";
     String content = "redis content ";
-    redisTemplate.boundValueOps("userKey").set(content);
+    redisUtils.set(key, content);
 
-    String rs = (String) redisTemplate.boundValueOps("userKey").get();
-    System.out.println("rs = " + rs);
-
-    String rs2 = (String) redisTemplate.opsForValue().get("userKey");
-    System.out.println("rs2 = " + rs2);
+    String result = redisUtils.get(key, String.class);
+    log.info("=== key= {}, value= {} ===", key, result);
   }
 }
