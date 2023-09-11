@@ -20,8 +20,7 @@ public class PageResult<T> {
 
   public static <T> PageResult<T> of(
       Integer current, Integer size, Integer total, List<T> collect) {
-    PageResult<T> tPageResult = new PageResult<>(current, size, total, collect);
-    return tPageResult;
+      return new PageResult<>(current, size, total, collect);
   }
 
   public static <T> PageResult<T> empty() {

@@ -21,6 +21,8 @@ public class LoginReq {
 
   @NotBlank private String password;
 
+  private String token;
+
   public void login(IAuth auth) {
     User domain = User.builder().username(account).password(password).build();
     auth.login(domain);

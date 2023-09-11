@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -93,7 +91,7 @@ public class RedisConfiguration {
   @Bean(name = "cacheManager")
   @Primary
   public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
-    Duration expiredDuration = Duration.ofSeconds(12 * 60 * 60);
+    Duration expiredDuration = Duration.ofSeconds((long) 12 * 60 * 60);
 
     GsonRedisSerializer<Object> gsonRedisSerializer = new GsonRedisSerializer<>(Object.class, gson);
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
