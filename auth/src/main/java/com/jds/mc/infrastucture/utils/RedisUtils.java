@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Generated
+@SuppressWarnings("all")
 public class RedisUtils {
 
   private final StringRedisTemplate redisTemplate;
@@ -74,33 +76,44 @@ public class RedisUtils {
 
   // endregion
 
-  // region scan 使用 scan 命令代替 keys 命令，在大数据量的情况下可以提高查询效率
-
+  // region
   /**
    * 分页获取指定格式key
+   *
+   * <p>scan 使用 scan 命令代替 keys 命令，在大数据量的情况下可以提高查询效率
+   *
+   * <p>keys * 这个命令千万别在生产环境乱用。特别是数据庞大的情况下。
+   *
+   * <p>因为Keys会引发Redis锁，并且增加Redis的CPU占用。
    *
    * @param patternKey 匹配key
    * @param pageIndex 页码
    * @param pageSize 页大小
    * @return {@link PageResult}<{@link String}>
    */
-  @Generated
   public PageResult<String> findKeysForPage(String patternKey, int pageIndex, int pageSize) {
     PageResult<String> result = PageResult.empty();
     List<String> keys = new ArrayList<>();
+
     int scanCount = Integer.MAX_VALUE;
     String match = "*%s*".formatted(patternKey);
 
     RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
     RedisConnection connection = Objects.requireNonNull(factory).getConnection();
-    ScanOptions options = ScanOptions.scanOptions().match(match).count(scanCount).build();
 
-    try (Cursor<byte[]> cursor = connection.scan(options)) {
+    // 创建 ScanOptions 对象
+    ScanOptions scanOptions =
+        ScanOptions.scanOptions()
+            .match(match) // 设置匹配模式
+            .count(scanCount) // 设置一次扫描返回的元素数量
+            .build();
+
+    try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
       int tmpIndex = 0;
       int startIndex = (pageIndex - 1) * pageSize;
       int end = pageIndex * pageSize;
       while (cursor.hasNext()) {
-        String key = new String(cursor.next());
+        String key = cursor.next();
         if (tmpIndex >= startIndex && tmpIndex < end) {
           keys.add(key);
         }
@@ -120,7 +133,6 @@ public class RedisUtils {
    * @param patternKey 匹配key
    * @return {@link List}<{@link String}>
    */
-  @Generated
   public List<String> findKeys(String patternKey) {
     List<String> result = new ArrayList<>();
 
@@ -132,9 +144,9 @@ public class RedisUtils {
             .count(Integer.MAX_VALUE)
             .build();
 
-    try (Cursor<byte[]> cursor = rc.scan(options)) {
+    try (Cursor<String> cursor = redisTemplate.scan(options)) {
       while (cursor.hasNext()) {
-        String key = new String(cursor.next());
+        String key = cursor.next();
         result.add(key);
       }
       RedisConnectionUtils.releaseConnection(rc, factory);
